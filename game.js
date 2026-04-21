@@ -1355,6 +1355,7 @@ let discoveredElements = new Set(STARTING_ELEMENTS);
 let combinationCount = 0;
 let workspaceElements = []; // {id, element, x, y, domNode}
 let nextWorkspaceId = 0;
+let playerName = localStorage.getItem('element-craft-player-name') || '';
 
 // Drag state
 let dragState = null; // {source:'sidebar'|'workspace', elementName, wsId, offsetX, offsetY, ghost}
@@ -1884,7 +1885,6 @@ function showLockedElements() {
 // ============================================
 function showScoreboard() {
     renderLocalScores();
-    renderGlobalScores();
     document.getElementById('scoreboard-modal').classList.remove('hidden');
 }
 
@@ -1909,7 +1909,7 @@ function renderLocalScores() {
                 <div class="score-rank">${rank}</div>
                 <div class="score-info">
                     <div class="score-name">${score.name}</div>
-                    <div class="score-stats">${score.discovered} element • ${score.combos} kombinasyon</div>
+                    <div class="score-stats">${score.discovered} element • ${score.combos} kombinasyon • ${score.date}</div>
                 </div>
                 <div class="score-value">${score.score}</div>
             </div>
@@ -1917,50 +1917,9 @@ function renderLocalScores() {
     }).join('');
 }
 
-function renderGlobalScores() {
-    const list = document.getElementById('global-score-list');
-    // GitHub Pages'da statik JSON dosyası kullanılabilir
-    // Şimdilik örnek veri gösterelim
-    const globalScores = [
-        { name: 'ElementMaster', discovered: 340, combos: 520, score: 9500, date: '2026-04-20' },
-        { name: 'AlchemyKing', discovered: 315, combos: 480, score: 8800, date: '2026-04-19' },
-        { name: 'CraftWizard', discovered: 290, combos: 445, score: 8100, date: '2026-04-18' },
-    ];
-
-    if (globalScores.length === 0) {
-        list.innerHTML = `
-            <div class="score-empty">
-                <div class="score-empty-icon">🌍</div>
-                <div class="score-empty-text">Henüz global skor yok!</div>
-            </div>
-        `;
-        return;
-    }
-
-    list.innerHTML = globalScores.map((score, index) => {
-        const rank = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
-        return `
-            <div class="global-score-entry">
-                <div class="global-score-rank">${rank}</div>
-                <div class="global-score-info">
-                    <div class="global-score-name">${score.name}</div>
-                    <div class="global-score-meta">
-                        <span>${score.discovered} element</span>
-                        <span>${score.date}</span>
-                    </div>
-                </div>
-                <div class="global-score-value">${score.score}</div>
-            </div>
-        `;
-    }).join('');
-}
-
 function saveScore() {
-    const name = prompt('İsmini gir:');
-    if (!name || name.trim() === '') return;
-
     const score = {
-        name: name.trim(),
+        name: playerName || 'Anonim Oyuncu',
         discovered: discoveredElements.size,
         combos: combinationCount,
         score: calculateScore(),
@@ -1976,7 +1935,7 @@ function saveScore() {
 
     localStorage.setItem('element-craft-scores', JSON.stringify(scores));
 
-    showToast('Skorun kaydedildi! 🏆', 'success');
+    showToast(`${playerName || 'Anonim'} - Skorun kaydedildi! 🏆`, 'success');
     renderLocalScores();
 }
 
@@ -2041,6 +2000,23 @@ function setupEvents() {
 }
 
 // ============================================
+// PLAYER NAME
+// ============================================
+function askPlayerName() {
+    if (playerName) return;
+
+    const name = prompt('🌟 Element Craft\'a hoş geldin! İsmini gir:');
+    if (name && name.trim()) {
+        playerName = name.trim();
+        localStorage.setItem('element-craft-player-name', playerName);
+        showToast(`Hoş geldin, ${playerName}! 🎮`, 'success');
+    } else {
+        playerName = 'Anonim Oyuncu';
+        localStorage.setItem('element-craft-player-name', playerName);
+    }
+}
+
+// ============================================
 // INIT
 // ============================================
 function init() {
@@ -2049,6 +2025,11 @@ function init() {
     setupEvents();
     renderSidebar();
     updateStats();
+
+    // Ask player name
+    setTimeout(() => {
+        askPlayerName();
+    }, 2500);
 
     // Hide loading
     setTimeout(() => {

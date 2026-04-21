@@ -831,41 +831,6 @@ body {
 /* ============================================
    Scoreboard
    ============================================ */
-.scoreboard-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-.scoreboard-tab {
-    flex: 1;
-    padding: 10px 16px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    background: var(--bg-tertiary);
-    color: var(--text-muted);
-    font-family: var(--font-family);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.scoreboard-tab:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-primary);
-}
-
-.scoreboard-tab.active {
-    background: var(--accent-primary);
-    border-color: var(--accent-primary);
-    color: #fff;
-}
-
-.scoreboard-content {
-    min-height: 200px;
-}
-
 .scoreboard-actions {
     margin-top: 16px;
     display: flex;
@@ -928,50 +893,7 @@ body {
     color: var(--accent-secondary);
 }
 
-.global-score-entry {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-sm);
-    margin-bottom: 8px;
-    border: 1px solid var(--border-color);
-}
-
-.global-score-rank {
-    font-size: 1.2rem;
-    min-width: 30px;
-    text-align: center;
-    color: var(--text-muted);
-}
-
-.global-score-info {
-    flex: 1;
-}
-
-.global-score-name {
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-}
-
-.global-score-meta {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    display: flex;
-    gap: 12px;
-    margin-top: 2px;
-}
-
-.global-score-value {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--accent-secondary);
-}
-
-#local-score-list,
-#global-score-list {
+#local-score-list {
     max-height: 300px;
     overflow-y: auto;
 }
@@ -989,31 +911,6 @@ body {
 
 .score-empty-text {
     font-size: 0.9rem;
-}
-
-.save-score-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 16px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-md);
-    margin-top: 16px;
-}
-
-.save-score-form input {
-    padding: 10px 14px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    background: var(--bg-card);
-    color: var(--text-primary);
-    font-family: var(--font-family);
-    font-size: 0.9rem;
-    outline: none;
-}
-
-.save-score-form input:focus {
-    border-color: var(--accent-primary);
 }
 
 /* ============================================
