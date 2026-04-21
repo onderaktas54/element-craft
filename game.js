@@ -1793,180 +1793,7 @@ function showCombineResult(elementName, isNew) {
     div.classList.remove('hidden', 'show');
     void div.offsetWidth;
     div.classList.add('show');
-
-    // Three.js combo text efekti
-    showComboText3D(elementName, el.emoji, isNew);
-
     setTimeout(() => { div.classList.add('hidden'); div.classList.remove('show'); }, 2500);
-}
-
-// ============================================
-// THREE.JS COMBO TEXT EFFECT
-// ============================================
-function showComboText3D(elementName, emoji, isNew) {
-    const container = document.getElementById('combo-text-container');
-    const canvas = document.createElement('canvas');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    container.appendChild(canvas);
-
-    const comboScene = new THREE.Scene();
-    const comboCamera = new THREE.PerspectiveCamera(60, canvas.width / canvas.height, 0.1, 1000);
-    comboCamera.position.z = 10;
-
-    const comboRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-    comboRenderer.setSize(canvas.width, canvas.height);
-    comboRenderer.setClearColor(0x000000, 0);
-
-    // Create text sprite using canvas texture
-    const textCanvas = document.createElement('canvas');
-    const ctx = textCanvas.getContext('2d');
-    textCanvas.width = 512;
-    textCanvas.height = 256;
-
-    // Background gradient
-    const gradient = ctx.createLinearGradient(0, 0, 512, 256);
-    if (isNew) {
-        gradient.addColorStop(0, 'rgba(108, 92, 231, 0.9)');
-        gradient.addColorStop(1, 'rgba(162, 155, 254, 0.9)');
-    } else {
-        gradient.addColorStop(0, 'rgba(0, 230, 118, 0.9)');
-        gradient.addColorStop(1, 'rgba(105, 240, 174, 0.9)');
-    }
-
-    // Draw rounded rectangle
-    const radius = 30;
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.moveTo(radius, 0);
-    ctx.lineTo(512 - radius, 0);
-    ctx.quadraticCurveTo(512, 0, 512, radius);
-    ctx.lineTo(512, 256 - radius);
-    ctx.quadraticCurveTo(512, 256, 512 - radius, 256);
-    ctx.lineTo(radius, 256);
-    ctx.quadraticCurveTo(0, 256, 0, 256 - radius);
-    ctx.lineTo(0, radius);
-    ctx.quadraticCurveTo(0, 0, radius, 0);
-    ctx.closePath();
-    ctx.fill();
-
-    // Draw text
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 48px Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(emoji + ' ' + elementName, 256, 110);
-
-    ctx.font = '24px Inter, sans-serif';
-    ctx.fillText(isNew ? '✨ YENİ KOMBO! ✨' : '✅ KOMBO!', 256, 180);
-
-    const texture = new THREE.CanvasTexture(textCanvas);
-    texture.needsUpdate = true;
-
-    const material = new THREE.SpriteMaterial({
-        map: texture,
-        transparent: true,
-        opacity: 0
-    });
-    const sprite = new THREE.Sprite(material);
-    sprite.scale.set(8, 4, 1);
-    sprite.position.set(0, 2, 0);
-    comboScene.add(sprite);
-
-    // Particle system for combo effect
-    const particleCount = 50;
-    const particleGeometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    const velocities = [];
-    const colors = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount; i++) {
-        positions[i * 3] = (Math.random() - 0.5) * 2;
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
-
-        velocities.push({
-            x: (Math.random() - 0.5) * 0.3,
-            y: (Math.random() - 0.5) * 0.3,
-            z: (Math.random() - 0.5) * 0.3
-        });
-
-        if (isNew) {
-            colors[i * 3] = 0.42 + Math.random() * 0.2;
-            colors[i * 3 + 1] = 0.36 + Math.random() * 0.2;
-            colors[i * 3 + 2] = 0.91 + Math.random() * 0.09;
-        } else {
-            colors[i * 3] = 0;
-            colors[i * 3 + 1] = 0.9 + Math.random() * 0.1;
-            colors[i * 3 + 2] = 0.46 + Math.random() * 0.2;
-        }
-    }
-
-    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    const particleMaterial = new THREE.PointsMaterial({
-        size: 0.15,
-        vertexColors: true,
-        transparent: true,
-        opacity: 1
-    });
-
-    const particles = new THREE.Points(particleGeometry, particleMaterial);
-    comboScene.add(particles);
-
-    // Light
-    comboScene.add(new THREE.AmbientLight(0xffffff, 1));
-
-    let frame = 0;
-    const totalFrames = 120;
-
-    function animateCombo() {
-        frame++;
-        const progress = frame / totalFrames;
-
-        if (progress < 0.2) {
-            // Fade in and scale up
-            material.opacity = progress / 0.2;
-            sprite.scale.set(8 * (0.5 + progress * 2.5), 4 * (0.5 + progress * 2.5), 1);
-            sprite.position.y = 2 + Math.sin(progress * Math.PI) * 2;
-        } else if (progress < 0.8) {
-            // Hold with bounce
-            material.opacity = 1;
-            sprite.position.y = 2 + Math.sin((progress - 0.2) * 5) * 0.5;
-            sprite.rotation.z = Math.sin((progress - 0.2) * 10) * 0.05;
-        } else {
-            // Fade out and move up
-            const fadeProgress = (progress - 0.8) / 0.2;
-            material.opacity = 1 - fadeProgress;
-            sprite.position.y = 2 + fadeProgress * 5;
-            sprite.scale.set(8 * (1 + fadeProgress * 0.3), 4 * (1 + fadeProgress * 0.3), 1);
-        }
-
-        // Update particles
-        const posArray = particles.geometry.attributes.position.array;
-        for (let i = 0; i < particleCount; i++) {
-            posArray[i * 3] += velocities[i].x * (1 + progress);
-            posArray[i * 3 + 1] += velocities[i].y * (1 + progress);
-            posArray[i * 3 + 2] += velocities[i].z * (1 + progress);
-        }
-        particles.geometry.attributes.position.needsUpdate = true;
-        particleMaterial.opacity = 1 - progress;
-
-        comboRenderer.render(comboScene, comboCamera);
-
-        if (frame < totalFrames) {
-            requestAnimationFrame(animateCombo);
-        } else {
-            comboRenderer.dispose();
-            canvas.remove();
-        }
-    }
-
-    animateCombo();
 }
 
 function spawnParticles(centerX, centerY) {
@@ -2053,6 +1880,112 @@ function showLockedElements() {
 }
 
 // ============================================
+// SCOREBOARD
+// ============================================
+function showScoreboard() {
+    renderLocalScores();
+    renderGlobalScores();
+    document.getElementById('scoreboard-modal').classList.remove('hidden');
+}
+
+function renderLocalScores() {
+    const list = document.getElementById('local-score-list');
+    const scores = JSON.parse(localStorage.getItem('element-craft-scores') || '[]');
+
+    if (scores.length === 0) {
+        list.innerHTML = `
+            <div class="score-empty">
+                <div class="score-empty-icon">📊</div>
+                <div class="score-empty-text">Henüz skor kaydedilmemiş!</div>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = scores.map((score, index) => {
+        const rank = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+        return `
+            <div class="score-entry">
+                <div class="score-rank">${rank}</div>
+                <div class="score-info">
+                    <div class="score-name">${score.name}</div>
+                    <div class="score-stats">${score.discovered} element • ${score.combos} kombinasyon</div>
+                </div>
+                <div class="score-value">${score.score}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderGlobalScores() {
+    const list = document.getElementById('global-score-list');
+    // GitHub Pages'da statik JSON dosyası kullanılabilir
+    // Şimdilik örnek veri gösterelim
+    const globalScores = [
+        { name: 'ElementMaster', discovered: 340, combos: 520, score: 9500, date: '2026-04-20' },
+        { name: 'AlchemyKing', discovered: 315, combos: 480, score: 8800, date: '2026-04-19' },
+        { name: 'CraftWizard', discovered: 290, combos: 445, score: 8100, date: '2026-04-18' },
+    ];
+
+    if (globalScores.length === 0) {
+        list.innerHTML = `
+            <div class="score-empty">
+                <div class="score-empty-icon">🌍</div>
+                <div class="score-empty-text">Henüz global skor yok!</div>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = globalScores.map((score, index) => {
+        const rank = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+        return `
+            <div class="global-score-entry">
+                <div class="global-score-rank">${rank}</div>
+                <div class="global-score-info">
+                    <div class="global-score-name">${score.name}</div>
+                    <div class="global-score-meta">
+                        <span>${score.discovered} element</span>
+                        <span>${score.date}</span>
+                    </div>
+                </div>
+                <div class="global-score-value">${score.score}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function saveScore() {
+    const name = prompt('İsmini gir:');
+    if (!name || name.trim() === '') return;
+
+    const score = {
+        name: name.trim(),
+        discovered: discoveredElements.size,
+        combos: combinationCount,
+        score: calculateScore(),
+        date: new Date().toISOString().split('T')[0]
+    };
+
+    const scores = JSON.parse(localStorage.getItem('element-craft-scores') || '[]');
+    scores.push(score);
+    scores.sort((a, b) => b.score - a.score);
+
+    // En fazla 10 skor tut
+    if (scores.length > 10) scores.pop();
+
+    localStorage.setItem('element-craft-scores', JSON.stringify(scores));
+
+    showToast('Skorun kaydedildi! 🏆', 'success');
+    renderLocalScores();
+}
+
+function calculateScore() {
+    // Her element 100 puan, her kombinasyon 50 puan
+    return (discoveredElements.size * 100) + (combinationCount * 50);
+}
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 function setupEvents() {
@@ -2069,6 +2002,7 @@ function setupEvents() {
     document.getElementById('btn-reset').addEventListener('click', resetGame);
     document.getElementById('btn-hint').addEventListener('click', showHint);
     document.getElementById('btn-locked').addEventListener('click', showLockedElements);
+    document.getElementById('btn-scoreboard').addEventListener('click', showScoreboard);
     document.getElementById('btn-info').addEventListener('click', () => {
         document.getElementById('info-modal').classList.remove('hidden');
     });
@@ -2081,6 +2015,23 @@ function setupEvents() {
     document.getElementById('locked-close').addEventListener('click', () => {
         document.getElementById('locked-modal').classList.add('hidden');
     });
+    document.getElementById('scoreboard-close').addEventListener('click', () => {
+        document.getElementById('scoreboard-modal').classList.add('hidden');
+    });
+    document.getElementById('btn-save-score').addEventListener('click', saveScore);
+
+    // Scoreboard tabs
+    document.querySelectorAll('.scoreboard-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.scoreboard-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const tabName = tab.dataset.tab;
+            document.getElementById('local-scores').classList.toggle('hidden', tabName !== 'local');
+            document.getElementById('global-scores').classList.toggle('hidden', tabName !== 'global');
+        });
+    });
+
     document.querySelectorAll('.modal').forEach(m => {
         m.addEventListener('click', (e) => { if (e.target === m) m.classList.add('hidden'); });
     });

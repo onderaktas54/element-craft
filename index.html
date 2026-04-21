@@ -44,6 +44,7 @@
             </div>
         </div>
         <div class="header-right">
+            <button id="btn-scoreboard" class="header-btn" title="Skor Tablosu">🏆</button>
             <button id="btn-locked" class="header-btn" title="Kilitli Elementler">🔒</button>
             <button id="btn-reset" class="header-btn" title="Oyunu Sıfırla">🔄</button>
             <button id="btn-hint" class="header-btn" title="İpucu">💡</button>
@@ -130,8 +131,26 @@
         <div class="result-message">Yeni element keşfedildi!</div>
     </div>
 
-    <!-- Three.js Combo Text Container -->
-    <div id="combo-text-container"></div>
+    <!-- Scoreboard Modal -->
+    <div id="scoreboard-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="scoreboard-close">&times;</button>
+            <h2>🏆 Skor Tablosu</h2>
+            <div class="scoreboard-tabs">
+                <button class="scoreboard-tab active" data-tab="local">Yerel</button>
+                <button class="scoreboard-tab" data-tab="global">Global</button>
+            </div>
+            <div id="local-scores" class="scoreboard-content">
+                <div id="local-score-list"></div>
+            </div>
+            <div id="global-scores" class="scoreboard-content hidden">
+                <div id="global-score-list"></div>
+            </div>
+            <div class="scoreboard-actions">
+                <button id="btn-save-score" class="score-btn">💾 Skorunu Kaydet</button>
+            </div>
+        </div>
+    </div>
 
     <script type="importmap">
     {
