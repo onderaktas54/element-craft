@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚗️ Element Craft - Element Birleştirme Oyunu</title>
-    <meta name="description" content="Elementleri sürükleyip birleştirerek yeni şeyler keşfet! 200+ element, 300+ kombinasyon.">
+    <meta name="description"
+        content="Elementleri sürükleyip birleştirerek yeni şeyler keşfet! 200+ element, 300+ kombinasyon.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- Loading Screen -->
     <div id="loading-screen">
@@ -40,6 +44,7 @@
             </div>
         </div>
         <div class="header-right">
+            <button id="btn-locked" class="header-btn" title="Kilitli Elementler">🔒</button>
             <button id="btn-reset" class="header-btn" title="Oyunu Sıfırla">🔄</button>
             <button id="btn-hint" class="header-btn" title="İpucu">💡</button>
             <button id="btn-info" class="header-btn" title="Nasıl Oynanır">❓</button>
@@ -108,12 +113,25 @@
         </div>
     </div>
 
+    <!-- Locked Elements Modal -->
+    <div id="locked-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="locked-close">&times;</button>
+            <h2>🔒 Kilitli Elementler</h2>
+            <p id="locked-count">0 element kilitli</p>
+            <div id="locked-list"></div>
+        </div>
+    </div>
+
     <!-- Combine Result Popup -->
     <div id="combine-result" class="hidden">
         <div class="result-emoji"></div>
         <div class="result-name"></div>
         <div class="result-message">Yeni element keşfedildi!</div>
     </div>
+
+    <!-- Three.js Combo Text Container -->
+    <div id="combo-text-container"></div>
 
     <script type="importmap">
     {
@@ -125,4 +143,5 @@
     </script>
     <script type="module" src="game.js"></script>
 </body>
+
 </html>

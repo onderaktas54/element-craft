@@ -1793,7 +1793,180 @@ function showCombineResult(elementName, isNew) {
     div.classList.remove('hidden', 'show');
     void div.offsetWidth;
     div.classList.add('show');
+
+    // Three.js combo text efekti
+    showComboText3D(elementName, el.emoji, isNew);
+
     setTimeout(() => { div.classList.add('hidden'); div.classList.remove('show'); }, 2500);
+}
+
+// ============================================
+// THREE.JS COMBO TEXT EFFECT
+// ============================================
+function showComboText3D(elementName, emoji, isNew) {
+    const container = document.getElementById('combo-text-container');
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    container.appendChild(canvas);
+
+    const comboScene = new THREE.Scene();
+    const comboCamera = new THREE.PerspectiveCamera(60, canvas.width / canvas.height, 0.1, 1000);
+    comboCamera.position.z = 10;
+
+    const comboRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    comboRenderer.setSize(canvas.width, canvas.height);
+    comboRenderer.setClearColor(0x000000, 0);
+
+    // Create text sprite using canvas texture
+    const textCanvas = document.createElement('canvas');
+    const ctx = textCanvas.getContext('2d');
+    textCanvas.width = 512;
+    textCanvas.height = 256;
+
+    // Background gradient
+    const gradient = ctx.createLinearGradient(0, 0, 512, 256);
+    if (isNew) {
+        gradient.addColorStop(0, 'rgba(108, 92, 231, 0.9)');
+        gradient.addColorStop(1, 'rgba(162, 155, 254, 0.9)');
+    } else {
+        gradient.addColorStop(0, 'rgba(0, 230, 118, 0.9)');
+        gradient.addColorStop(1, 'rgba(105, 240, 174, 0.9)');
+    }
+
+    // Draw rounded rectangle
+    const radius = 30;
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.lineTo(512 - radius, 0);
+    ctx.quadraticCurveTo(512, 0, 512, radius);
+    ctx.lineTo(512, 256 - radius);
+    ctx.quadraticCurveTo(512, 256, 512 - radius, 256);
+    ctx.lineTo(radius, 256);
+    ctx.quadraticCurveTo(0, 256, 0, 256 - radius);
+    ctx.lineTo(0, radius);
+    ctx.quadraticCurveTo(0, 0, radius, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 48px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji + ' ' + elementName, 256, 110);
+
+    ctx.font = '24px Inter, sans-serif';
+    ctx.fillText(isNew ? '✨ YENİ KOMBO! ✨' : '✅ KOMBO!', 256, 180);
+
+    const texture = new THREE.CanvasTexture(textCanvas);
+    texture.needsUpdate = true;
+
+    const material = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        opacity: 0
+    });
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(8, 4, 1);
+    sprite.position.set(0, 2, 0);
+    comboScene.add(sprite);
+
+    // Particle system for combo effect
+    const particleCount = 50;
+    const particleGeometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = [];
+    const colors = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 2;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+
+        velocities.push({
+            x: (Math.random() - 0.5) * 0.3,
+            y: (Math.random() - 0.5) * 0.3,
+            z: (Math.random() - 0.5) * 0.3
+        });
+
+        if (isNew) {
+            colors[i * 3] = 0.42 + Math.random() * 0.2;
+            colors[i * 3 + 1] = 0.36 + Math.random() * 0.2;
+            colors[i * 3 + 2] = 0.91 + Math.random() * 0.09;
+        } else {
+            colors[i * 3] = 0;
+            colors[i * 3 + 1] = 0.9 + Math.random() * 0.1;
+            colors[i * 3 + 2] = 0.46 + Math.random() * 0.2;
+        }
+    }
+
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const particleMaterial = new THREE.PointsMaterial({
+        size: 0.15,
+        vertexColors: true,
+        transparent: true,
+        opacity: 1
+    });
+
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    comboScene.add(particles);
+
+    // Light
+    comboScene.add(new THREE.AmbientLight(0xffffff, 1));
+
+    let frame = 0;
+    const totalFrames = 120;
+
+    function animateCombo() {
+        frame++;
+        const progress = frame / totalFrames;
+
+        if (progress < 0.2) {
+            // Fade in and scale up
+            material.opacity = progress / 0.2;
+            sprite.scale.set(8 * (0.5 + progress * 2.5), 4 * (0.5 + progress * 2.5), 1);
+            sprite.position.y = 2 + Math.sin(progress * Math.PI) * 2;
+        } else if (progress < 0.8) {
+            // Hold with bounce
+            material.opacity = 1;
+            sprite.position.y = 2 + Math.sin((progress - 0.2) * 5) * 0.5;
+            sprite.rotation.z = Math.sin((progress - 0.2) * 10) * 0.05;
+        } else {
+            // Fade out and move up
+            const fadeProgress = (progress - 0.8) / 0.2;
+            material.opacity = 1 - fadeProgress;
+            sprite.position.y = 2 + fadeProgress * 5;
+            sprite.scale.set(8 * (1 + fadeProgress * 0.3), 4 * (1 + fadeProgress * 0.3), 1);
+        }
+
+        // Update particles
+        const posArray = particles.geometry.attributes.position.array;
+        for (let i = 0; i < particleCount; i++) {
+            posArray[i * 3] += velocities[i].x * (1 + progress);
+            posArray[i * 3 + 1] += velocities[i].y * (1 + progress);
+            posArray[i * 3 + 2] += velocities[i].z * (1 + progress);
+        }
+        particles.geometry.attributes.position.needsUpdate = true;
+        particleMaterial.opacity = 1 - progress;
+
+        comboRenderer.render(comboScene, comboCamera);
+
+        if (frame < totalFrames) {
+            requestAnimationFrame(animateCombo);
+        } else {
+            comboRenderer.dispose();
+            canvas.remove();
+        }
+    }
+
+    animateCombo();
 }
 
 function spawnParticles(centerX, centerY) {
@@ -1852,6 +2025,34 @@ function showHint() {
 }
 
 // ============================================
+// LOCKED ELEMENTS
+// ============================================
+function showLockedElements() {
+    const allNames = Object.keys(ALL_ELEMENTS);
+    const locked = allNames.filter(n => !discoveredElements.has(n));
+    const lockedList = document.getElementById('locked-list');
+    const lockedCount = document.getElementById('locked-count');
+
+    lockedCount.textContent = `${locked.length} element kilitli`;
+    lockedList.innerHTML = '';
+
+    if (locked.length === 0) {
+        lockedList.innerHTML = '<p style="text-align:center; padding:20px; color: var(--accent-success);">🎊 Tüm elementleri keşfettin!</p>';
+    } else {
+        locked.forEach(name => {
+            const el = ALL_ELEMENTS[name];
+            if (!el) return;
+            const div = document.createElement('div');
+            div.className = 'locked-element';
+            div.innerHTML = `<span class="locked-emoji">❓</span><span class="locked-name">${name}</span><span class="locked-category">${el.category}</span>`;
+            lockedList.appendChild(div);
+        });
+    }
+
+    document.getElementById('locked-modal').classList.remove('hidden');
+}
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 function setupEvents() {
@@ -1867,6 +2068,7 @@ function setupEvents() {
     // Buttons
     document.getElementById('btn-reset').addEventListener('click', resetGame);
     document.getElementById('btn-hint').addEventListener('click', showHint);
+    document.getElementById('btn-locked').addEventListener('click', showLockedElements);
     document.getElementById('btn-info').addEventListener('click', () => {
         document.getElementById('info-modal').classList.remove('hidden');
     });
@@ -1875,6 +2077,9 @@ function setupEvents() {
     });
     document.getElementById('hint-close').addEventListener('click', () => {
         document.getElementById('hint-modal').classList.add('hidden');
+    });
+    document.getElementById('locked-close').addEventListener('click', () => {
+        document.getElementById('locked-modal').classList.add('hidden');
     });
     document.querySelectorAll('.modal').forEach(m => {
         m.addEventListener('click', (e) => { if (e.target === m) m.classList.add('hidden'); });
