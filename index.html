@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚗️ Element Craft - Element Birleştirme Oyunu</title>
+    <meta name="description" content="Elementleri sürükleyip birleştirerek yeni şeyler keşfet! 200+ element, 300+ kombinasyon.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-emoji">⚗️</div>
+            <h1>Element Craft</h1>
+            <p>Evren oluşturuluyor...</p>
+            <div class="loading-bar">
+                <div class="loading-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header id="game-header">
+        <div class="header-left">
+            <h1>⚗️ Element Craft</h1>
+        </div>
+        <div class="header-center">
+            <div class="stat-box">
+                <span class="stat-label">Keşfedilen</span>
+                <span class="stat-value" id="discovered-count">4</span>
+                <span class="stat-total" id="discovered-total">/ 0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Kombinasyon</span>
+                <span class="stat-value" id="combo-count">0</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button id="btn-reset" class="header-btn" title="Oyunu Sıfırla">🔄</button>
+            <button id="btn-hint" class="header-btn" title="İpucu">💡</button>
+            <button id="btn-info" class="header-btn" title="Nasıl Oynanır">❓</button>
+        </div>
+    </header>
+
+    <!-- Main Game Area -->
+    <div id="game-container">
+        <!-- Three.js Background Canvas -->
+        <canvas id="bg-canvas"></canvas>
+
+        <!-- Workspace - where you drag and combine elements -->
+        <div id="workspace">
+            <!-- Elements will be dragged here and combined -->
+            <div id="workspace-hint">
+                <span>Sağ panelden elementleri buraya sürükle ve birbirine yaklaştır!</span>
+            </div>
+        </div>
+
+        <!-- Sidebar - Element Inventory -->
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h2>📦 Elementler</h2>
+                <input type="text" id="search-input" placeholder="Element ara..." autocomplete="off">
+            </div>
+            <div class="category-tabs" id="category-tabs">
+                <button class="cat-tab active" data-category="all">Tümü</button>
+            </div>
+            <div id="element-list"></div>
+        </aside>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <h2>🎮 Nasıl Oynanır?</h2>
+            <div class="info-steps">
+                <div class="info-step">
+                    <span class="step-num">1</span>
+                    <p>Sağ panelden elementleri <strong>sürükleyip</strong> çalışma alanına bırakın</p>
+                </div>
+                <div class="info-step">
+                    <span class="step-num">2</span>
+                    <p>İki elementi birbirine <strong>üst üste sürükleyin</strong> — otomatik birleşirler!</p>
+                </div>
+                <div class="info-step">
+                    <span class="step-num">3</span>
+                    <p>Yeni elementler keşfedin ve koleksiyonunuzu büyütün! 🚀</p>
+                </div>
+                <div class="info-step">
+                    <span class="step-num">4</span>
+                    <p>Çift tıklayarak çalışma alanındaki elementi silebilirsiniz</p>
+                </div>
+            </div>
+            <p class="info-tip">💡 İpucu: 4 temel elementle başlayın: 💧 Su, 🔥 Ateş, 🌍 Toprak, 💨 Hava</p>
+        </div>
+    </div>
+
+    <!-- Hint Modal -->
+    <div id="hint-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="hint-close">&times;</button>
+            <h2>💡 İpucu</h2>
+            <p id="hint-text">Yükleniyor...</p>
+        </div>
+    </div>
+
+    <!-- Combine Result Popup -->
+    <div id="combine-result" class="hidden">
+        <div class="result-emoji"></div>
+        <div class="result-name"></div>
+        <div class="result-message">Yeni element keşfedildi!</div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="game.js"></script>
+</body>
+</html>
